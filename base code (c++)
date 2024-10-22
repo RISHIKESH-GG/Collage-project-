@@ -1,0 +1,196 @@
+
+
+#include <iostream>
+#include <string>
+#include <vector>
+
+class Account {
+private:
+    int accountNumber;
+    std::string name;
+    double balance;
+    std::string password;
+    std::vector<std::string> transactionHistory;
+
+public:
+    Account(int accNo, std::string accName, double initialBalance, std::string pass)
+        : accountNumber(accNo), name(accName), balance(initialBalance), password(pass) {}
+
+    void deposit(double amount) {
+        balance += amount;
+        transactionHistory.push_back("Deposit: " + std::to_string(amount));
+    }
+
+    bool withdraw(double amount) {
+        if (amount > balance) {
+            std::cout << "Insufficient balance!" << std::endl;
+            return false;
+        }
+        balance -= amount;
+        transactionHistory.push_back("Withdraw: " + std::to_string(amount));
+        return true;
+    }
+
+    void showBalance() const {
+        std::cout << "Account Balance: $" << balance << std::endl;
+    }
+
+    void showAccountDetails() const {
+        std::cout << "Account Number: " << accountNumber << "\nName: " << name << "\nBalance: $" << balance << std::endl;
+    }
+
+    bool verifyPassword(std::string inputPassword) const {
+        return password == inputPassword;
+    }
+
+    int getAccountNumber() const {
+        return accountNumber;
+    }
+};
+
+class Bank {
+private:
+    std::vector<Account> accounts;
+    int accountCount;
+
+public:
+    Bank() : accountCount(0) {}
+
+    void createAccount(std::string name, double initialDeposit, std::string password) {
+        ++accountCount;  // Increment account count to assign a new account number
+        Account newAccount(accountCount, name, initialDeposit, password);
+        accounts.push_back(newAccount);
+        std::cout << "Account created successfully with Account Number: " << accountCount << std::endl;
+    }
+
+    void deposit(int accountNumber, std::string password, double amount) {
+        for (auto &acc : accounts) {
+            if (acc.getAccountNumber() == accountNumber && acc.verifyPassword(password)) {
+                acc.deposit(amount);
+                std::cout << "Deposit successful. New balance: ";
+                acc.showBalance();
+                return;
+            }
+        }
+        std::cout << "Invalid account number or password." << std::endl;
+    }
+
+    void withdraw(int accountNumber, std::string password, double amount) {
+        for (auto &acc : accounts) {
+            if (acc.getAccountNumber() == accountNumber && acc.verifyPassword(password)) {
+                if (acc.withdraw(amount)) {
+                    std::cout << "Withdraw successful. New balance: ";
+                    acc.showBalance();
+                }
+                return;
+            }
+        }
+        std::cout << "Invalid account number or password." << std::endl;
+    }
+
+    void checkBalance(int accountNumber, std::string password) {
+        for (auto &acc : accounts) {
+            if (acc.getAccountNumber() == accountNumber && acc.verifyPassword(password)) {
+                acc.showBalance();
+                return;
+            }
+        }
+        std::cout << "Invalid account number or password." << std::endl;
+    }
+
+    double calculateLoanInterest(double principal, double rate, int years) {
+        double interest = principal * (rate / 100) * years;
+        return interest;
+    }
+};
+
+void showMenu() {
+    std::cout << "Welcome to the Bank System\n";
+    std::cout << "1. Create Account\n";
+    std::cout << "2. Deposit\n";
+    std::cout << "3. Withdraw\n";
+    std::cout << "4. Check Balance\n";
+    std::cout << "5. Calculate Loan Interest\n";
+    std::cout << "6. Exit\n";
+}
+
+int main() {
+    Bank bank;
+    int choice;
+
+    do {
+        showMenu();
+        std::cin >> choice;
+
+        switch (choice) {
+        case 1: {
+            std::string name, password;
+            double initialDeposit;
+            std::cout << "Enter name: ";
+            std::cin >> name;
+            std::cout << "Enter initial deposit: ";
+            std::cin >> initialDeposit;
+            std::cout << "Enter password: ";
+            std::cin >> password;
+            bank.createAccount(name, initialDeposit, password);
+            break;
+        }
+        case 2: {
+            int accountNumber;
+            std::string password;
+            double amount;
+            std::cout << "Enter account number: ";
+            std::cin >> accountNumber;
+            std::cout << "Enter password: ";
+            std::cin >> password;
+            std::cout << "Enter deposit amount: ";
+            std::cin >> amount;
+            bank.deposit(accountNumber, password, amount);
+            break;
+        }
+        case 3: {
+            int accountNumber;
+            std::string password;
+            double amount;
+            std::cout << "Enter account number: ";
+            std::cin >> accountNumber;
+            std::cout << "Enter password: ";
+            std::cin >> password;
+            std::cout << "Enter withdraw amount: ";
+            std::cin >> amount;
+            bank.withdraw(accountNumber, password, amount);
+            break;
+        }
+        case 4: {
+            int accountNumber;
+            std::string password;
+            std::cout << "Enter account number: ";
+            std::cin >> accountNumber;
+            std::cout << "Enter password: ";
+            std::cin >> password;
+            bank.checkBalance(accountNumber, password);
+            break;
+        }
+        case 5: {
+            double principal, rate;
+            int years;
+            std::cout << "Enter loan amount (principal): ";
+            std::cin >> principal;
+            std::cout << "Enter interest rate (in %): ";
+            std::cin >> rate;
+            std::cout << "Enter duration (in years): ";
+            std::cin >> years;
+            double interest = bank.calculateLoanInterest(principal, rate, years);
+            std::cout << "The interest on the loan is: $" << interest << std::endl;
+            break;
+        }
+        case 6:
+            std::cout << "Thank you for using the system!" << std::endl;
+            break;
+        default:
+            std::cout << "Invalid choice!" << std::endl;
+        }
+    } while (choice != 6);
+
+    return 0;
+}
