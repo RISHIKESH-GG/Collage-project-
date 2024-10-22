@@ -3,4 +3,4 @@ This is a banking application that allows users to create an account with a pass
 
 The core functionality is maintained in the C++ code, which handles the banking operations such as account management and financial transactions. The Qt interface enhances the user experience by providing an easy-to-navigate and visually appealing environment.
 
-The base code for the project is provided in the file named "base code."
+The base code for the project is provided in the file named "base code(c++)."
